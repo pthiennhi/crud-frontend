@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 export default function Home() {
   const rowHeaderStyle =
@@ -9,7 +9,6 @@ export default function Home() {
   const textBodyStyle =
     "text-md text-gray-900 font-light px-2 py-1 md:px-6 md:py-4 whitespace-nowrap";
   const [users, setUsers] = useState([]);
-
   useEffect(() => {
     loadUsers();
     // fetch("http://localhost:8081/users")
@@ -23,6 +22,10 @@ export default function Home() {
   const loadUsers = async () => {
     const result = await axios.get("http://localhost:8081/users");
     setUsers(result.data);
+  };
+  const handleDelete = async (id) => {
+    await axios.delete(`http://localhost:8081/user/${id}`);
+    loadUsers();
   };
   return (
     <div className="home h-full pt-2">
@@ -46,7 +49,10 @@ export default function Home() {
                       <th scope="col" className={rowHeaderStyle}>
                         Email
                       </th>
-                      <th scope="col" className="text-md font-medium text-indigo-50 px-2 py-1 md:px-6 md:py-4 text-center">
+                      <th
+                        scope="col"
+                        className="text-md font-medium text-indigo-50 px-2 py-1 md:px-6 md:py-4 text-center"
+                      >
                         Action
                       </th>
                     </tr>
@@ -60,22 +66,23 @@ export default function Home() {
                         <td className={textBodyStyle}>{user.username}</td>
                         <td className={textBodyStyle}>{user.name}</td>
                         <td className={textBodyStyle}>{user.email}</td>
-                        <td >
-                          <Link className="mr-2" to="/view">
+                        <td>
+                          <Link className="mr-2" to={`/view/${user.id}`}>
                             <button className=" max-w-min bg-indigo-600 text-xs px-2 md:text-md text-gray-100 md:px-4 py-1 rounded-lg hover:bg-gray-800 hover:text-gray-100 hover:cursor-pointer">
                               View
                             </button>
                           </Link>
-                          <Link className="mr-2" to="/edit">
+                          <Link className="mr-2" to={`/edit/${user.id}`}>
                             <button className="max-w-min text-indigo-600 text-xs px-2 md:text-md bg-gray-100 md:px-4 py-1 rounded-lg hover:bg-gray-800 hover:text-gray-100 hover:cursor-pointer">
                               Edit
                             </button>
                           </Link>
-                          <Link className="mr-2" to="/delete">
-                            <button className="max-w-min bg-red-600 text-xs px-2 md:text-md text-gray-100 md:px-4 py-1 rounded-lg hover:bg-gray-800 hover:text-gray-100 hover:cursor-pointer">
-                              Delete
-                            </button>
-                          </Link>
+                          <button
+                            onClick={() => handleDelete(user.id)}
+                            className="mr-2 max-w-min bg-red-600 text-xs px-2 md:text-md text-gray-100 md:px-4 py-1 rounded-lg hover:bg-gray-800 hover:text-gray-100 hover:cursor-pointer"
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))}
